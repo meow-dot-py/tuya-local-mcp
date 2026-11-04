@@ -10,6 +10,7 @@ The package is split by responsibility so each piece can be read on its own:
     engine.py    talking to the bulbs in parallel, with automatic IP repair
     commands.py  the actions both front-ends share (on/off/toggle/preset/set/status)
     timers.py    delayed commands that survive the terminal or Claude Code closing
+    signals.py   red/green build and test signals, and the Claude Code hook entry point
     render.py    TrueColor terminal output
     cli.py       the `tuya-local-mcp` / `l` command line
     server.py    the MCP server for Claude Code

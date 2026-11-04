@@ -48,6 +48,8 @@ Usage: l [target] <command>
   scan                         find lights whose IP changed (automatic on errors too)
   init                         one-time: fetch your bulbs' local keys with the tinytuya wizard
   serve                        run the MCP server for Claude Code
+  signal fail|pass [target]    try the build/test signal: red, then green and restore
+  hook                         Claude Code hook entry point (reads the event from stdin)
 
 Targets: all (default), a light's zone or name, or a word of its name.
 Combine with commas: `l bed,setup off`. Config folder: {home}
@@ -55,7 +57,7 @@ Combine with commas: `l bed,setup off`. Config folder: {home}
 
 POWER_WORDS = {"on", "off", "toggle", "t"}
 ACTION_WORDS = POWER_WORDS | {"status", "rgb", "sleep"}
-GLOBAL_WORDS = {"presets", "lights", "scan", "init", "serve", "help", "version"}
+GLOBAL_WORDS = {"presets", "lights", "scan", "init", "serve", "help", "version", "signal", "hook"}
 
 
 class UsageError(ValueError):
@@ -77,6 +79,10 @@ def main(argv: list[str]) -> int:
     first = argv[0].lower()
     if first == timers.HIDDEN_COMMAND:
         return timers.run_later(argv[1:])
+    if first == "_signal":
+        from tuya_local_mcp.signals import run_worker
+
+        return run_worker(argv[1:])
     if first in ("serve", "--serve", "mcp"):
         return serve()
     if first in ("help", "-h", "--help"):
@@ -85,12 +91,18 @@ def main(argv: list[str]) -> int:
     if first in ("version", "--version", "-v"):
         print(f"tuya-local-mcp {__version__}")
         return 0
+    if first == "hook":
+        from tuya_local_mcp.signals import handle_hook
+
+        return handle_hook(sys.stdin.read())
 
     try:
         if first == "init":
             return init()
         if first == "presets":
             return list_presets()
+        if first == "signal":
+            return signal(argv[1:])
         return run(argv)
     except (UsageError, config.ConfigError, UnknownTarget, CommandError, PresetError,
             InvalidState) as e:  # fmt: skip
@@ -255,6 +267,21 @@ def init() -> int:
     lights = devices.load_lights()
     print(f"\n{render.tag('READY', (80, 250, 123))} {len(lights)} device(s) configured:")
     return list_lights(lights)
+
+
+def signal(args: list[str]) -> int:
+    from tuya_local_mcp import signals
+
+    kind = args[0].lower() if args else ""
+    if kind not in ("fail", "pass") or len(args) > 2:
+        raise UsageError("Usage: l signal fail [target]  |  l signal pass")
+    if kind == "fail":
+        result = signals.signal_fail(args[1] if len(args) > 1 else None)
+        print(f"{render.tag('SIGNAL', render.RED)} {result}")
+    else:
+        result = signals.signal_pass()
+        print(f"{render.tag('SIGNAL', (0, 255, 80))} {result}")
+    return 0
 
 
 def serve() -> int:

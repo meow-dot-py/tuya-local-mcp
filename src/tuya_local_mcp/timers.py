@@ -50,20 +50,33 @@ def format_duration(seconds: int) -> str:
 
 def schedule(seconds: int, cmd: Command) -> None:
     """Start a detached process that runs `cmd` after `seconds`."""
-    args = [sys.executable, "-m", "tuya_local_mcp", HIDDEN_COMMAND, str(seconds), cmd.to_json()]
+    spawn_detached([HIDDEN_COMMAND, str(seconds), cmd.to_json()])
+
+
+def spawn_detached(cli_args: list[str]) -> None:
+    """Run `python -m tuya_local_mcp <cli_args>` in a process that outlives its parent.
+
+    Used for timers and for hook work: Claude Code may end a hook (or the whole
+    session) at any moment, and a half-finished light change must not be left behind.
+    """
+    args = [sys.executable, "-m", "tuya_local_mcp", *cli_args]
     options: dict = {
         "stdin": subprocess.DEVNULL,
         "stdout": subprocess.DEVNULL,
         "stderr": subprocess.DEVNULL,
         "close_fds": True,
     }
-    if sys.platform == "win32":
-        # No console window, and Ctrl+C in the parent terminal does not reach it.
-        options["creationflags"] = subprocess.CREATE_NO_WINDOW | subprocess.CREATE_NEW_PROCESS_GROUP
-    else:
+    if sys.platform != "win32":
         # Own session: closing the terminal (SIGHUP) does not kill it.
-        options["start_new_session"] = True
-    subprocess.Popen(args, **options)
+        subprocess.Popen(args, start_new_session=True, **options)
+        return
+    # No console window, Ctrl+C in the parent does not reach it, and (when the parent's
+    # job object allows it) it leaves that job, so killing the parent's tree spares it.
+    base = subprocess.CREATE_NO_WINDOW | subprocess.CREATE_NEW_PROCESS_GROUP
+    try:
+        subprocess.Popen(args, creationflags=base | subprocess.CREATE_BREAKAWAY_FROM_JOB, **options)
+    except OSError:
+        subprocess.Popen(args, creationflags=base, **options)
 
 
 def run_later(argv: list[str]) -> int:

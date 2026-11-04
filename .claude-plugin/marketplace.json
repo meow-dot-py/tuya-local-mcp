@@ -1,0 +1,17 @@
+{
+  "name": "tuya-local-mcp",
+  "owner": {
+    "name": "Johann 'M' Nestorida",
+    "url": "https://github.com/meow-dot-py"
+  },
+  "metadata": {
+    "description": "Control Tuya / Smart Life lights from Claude Code over your LAN."
+  },
+  "plugins": [
+    {
+      "name": "tuya-local",
+      "source": "./plugin",
+      "description": "Room lights for Claude Code: /light command, red/green build and test signals, optional ambient mood. Needs the tuya-local-mcp command installed."
+    }
+  ]
+}

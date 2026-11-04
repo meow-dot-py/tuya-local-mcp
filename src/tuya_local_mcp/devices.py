@@ -159,6 +159,7 @@ def scan_lan(seconds: int = 8, want_ids: Iterable[str] | None = None) -> dict[st
     """
     _tinytuya.load()
     from tinytuya import scanner  # lazy: only needed here
+
     wanted = tuple(want_ids) if want_ids else None
     found = scanner.devices(verbose=False, scantime=seconds, poll=False, byID=True, wantids=wanted)
     out: dict[str, dict[str, Any]] = {}

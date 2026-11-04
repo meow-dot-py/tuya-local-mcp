@@ -1,0 +1,29 @@
+{
+  "description": "Red/green light signals for failing and recovering tests/builds, and the optional ambient mood instructions.",
+  "hooks": {
+    "SessionStart": [
+      {
+        "matcher": "startup|resume|clear|compact",
+        "hooks": [
+          { "type": "command", "command": "tuya-local-mcp", "args": ["hook"], "timeout": 10 }
+        ]
+      }
+    ],
+    "PostToolUseFailure": [
+      {
+        "matcher": "Bash",
+        "hooks": [
+          { "type": "command", "command": "tuya-local-mcp", "args": ["hook"], "async": true }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "Bash",
+        "hooks": [
+          { "type": "command", "command": "tuya-local-mcp", "args": ["hook"], "async": true }
+        ]
+      }
+    ]
+  }
+}

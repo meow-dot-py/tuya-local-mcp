@@ -34,7 +34,7 @@ from tuya_local_mcp.state import InvalidState, LightState, make_state
 RESERVED_NAMES = frozenset(
     {
         "all", "on", "off", "toggle", "t", "status", "scan", "sleep", "rgb",
-        "presets", "lights", "init", "serve", "help", "version",
+        "presets", "lights", "init", "serve", "help", "version", "signal", "hook",
     }
 )  # fmt: skip
 

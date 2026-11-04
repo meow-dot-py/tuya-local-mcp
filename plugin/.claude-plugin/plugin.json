@@ -1,0 +1,40 @@
+{
+  "name": "tuya-local",
+  "displayName": "Tuya Local Lights",
+  "version": "0.1.0",
+  "description": "Control Tuya / Smart Life lights over your LAN: a /light command, red/green signals when tests or builds fail and recover, and an optional ambient mood mode.",
+  "author": {
+    "name": "Johann 'M' Nestorida",
+    "url": "https://github.com/meow-dot-py"
+  },
+  "homepage": "https://github.com/meow-dot-py/tuya-local-mcp",
+  "repository": "https://github.com/meow-dot-py/tuya-local-mcp",
+  "license": "MIT",
+  "keywords": ["tuya", "smart-life", "lights", "smart-home", "mcp", "hooks"],
+  "userConfig": {
+    "signals": {
+      "type": "boolean",
+      "title": "Build/test signals",
+      "description": "Turn the lights red when a test or build fails, then flash green and restore them when it passes again.",
+      "default": true
+    },
+    "signal_target": {
+      "type": "string",
+      "title": "Signal lights",
+      "description": "Which lights show the red/green signal: all, or a light's zone or name (comma-separated for several), e.g. setup.",
+      "default": "all"
+    },
+    "signal_commands": {
+      "type": "string",
+      "title": "Signal commands (regex)",
+      "description": "Optional regular expression for the commands that count as tests or builds. Leave empty for the built-in list (pytest, npm test, cargo build, go test, make, ...).",
+      "default": ""
+    },
+    "ambient": {
+      "type": "boolean",
+      "title": "Ambient mood",
+      "description": "Let Claude set the room mood on its own (focus while debugging, chill late at night). Adds a short instruction to each session.",
+      "default": false
+    }
+  }
+}
