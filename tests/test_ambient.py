@@ -30,3 +30,17 @@ def test_server_instructions_include_ambient_only_when_enabled(three_lights, mon
     monkeypatch.setenv("TUYA_LOCAL_MCP_AMBIENT", "true")
     text = server._instructions()
     assert "Targets: all" in text and "ambient mode" in text
+
+
+def test_set_light_description_mentions_ambient_only_when_enabled(three_lights, monkeypatch):
+    import asyncio
+
+    def set_light_description() -> str:
+        tools = asyncio.run(server.build_server().list_tools())
+        return next(t.description for t in tools if t.name == "set_light")
+
+    assert "Ambient mode is on" not in set_light_description()
+    monkeypatch.setenv("TUYA_LOCAL_MCP_AMBIENT", "true")
+    description = set_light_description()
+    assert description.startswith("Apply a preset/scene")
+    assert "Ambient mode is on" in description

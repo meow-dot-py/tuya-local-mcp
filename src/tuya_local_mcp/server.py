@@ -18,6 +18,7 @@ Bad input raises an error with a message that says how to fix it.
 from __future__ import annotations
 
 import functools
+import inspect
 from collections.abc import Callable
 from datetime import datetime
 from typing import Any, Literal
@@ -53,6 +54,13 @@ def _instructions() -> str:
     if _ambient_enabled():
         lines += ["", ambient.guidance(claude_code=False)]
     return "\n".join(lines)
+
+
+AMBIENT_TOOL_NOTE = (
+    "Ambient mode is on: also use this on your own, without being asked, to match the "
+    "room's mood to the conversation (work or study: focus/code; games: gaming/cyber; "
+    "late at night: chill/night). Once per topic, quietly."
+)
 
 
 def _ambient_enabled() -> bool:
@@ -93,7 +101,12 @@ def build_server() -> Any:
             except (ValueError, ConfigError) as e:
                 raise ToolError(str(e)) from None
 
-        return mcp.tool()(wrapper)
+        description = None
+        if fn.__name__ == "set_light" and _ambient_enabled():
+            # Some clients load connector tools on demand, so the server instructions
+            # may never be read; the tool description is what gets found and seen.
+            description = inspect.cleandoc(fn.__doc__ or "") + "\n\n" + AMBIENT_TOOL_NOTE
+        return mcp.tool(description=description)(wrapper)
 
     @tool
     def list_lights() -> dict:

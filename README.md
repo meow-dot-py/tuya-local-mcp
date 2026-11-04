@@ -209,6 +209,12 @@ Ambient mode works here too, in two ways:
 - **Always on:** set `TUYA_LOCAL_MCP_AMBIENT` to `"true"` in the config above. Every chat starts with the ambient instructions, and Claude reads the local time from `light_status` when the hour matters.
 - **For one chat:** **+ → Connectors → Add from tuya-local → Ambient mode** attaches the instructions, with the current time, to your message. Use it when the variable is off, or to refresh the time in a long-running chat.
 
+The chat may load connector tools only when something in the conversation points to them, so Claude might not think of the lights unless you hint at them ("set the mood, I'm going to game"). To have it always aware, paste one line into **Settings → Profile → personal preferences**:
+
+```text
+My room lights can be controlled with the tuya-local tools: set the mood on your own when the topic changes (work/study: focus, games: gaming, late night: chill).
+```
+
 Using both the plugin and this config entry? The desktop app also hands this server to its Code tab sessions, so the plugin notices it and steps aside there: its own copy of the server registers no tools, and its ambient hook stays quiet if the entry above has ambient on. You get each tool once. The terminal `claude` CLI doesn't read this file, so it keeps using the plugin's copy.
 
 What you don't get outside Claude Code: the `/light` shortcut (you don't need it, just ask) and the red/green test signals (there are no commands to watch in a chat).
