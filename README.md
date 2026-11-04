@@ -201,13 +201,13 @@ The Claude desktop app can use the MCP server in normal chats, so you can say "m
    Use the full path from step 1 (on Windows, double each backslash). The desktop app doesn't always see the same PATH as your terminal.
 
    Can't find the menu? Edit the file directly. Usually it's `%APPDATA%\Claude\claude_desktop_config.json` on Windows and `~/Library/Application Support/Claude/claude_desktop_config.json` on macOS. Microsoft Store installs may keep it elsewhere, such as `%LOCALAPPDATA%\Claude-Data\claude_<id>\`. This PowerShell command finds it: `Get-ChildItem $env:APPDATA, $env:LOCALAPPDATA -Recurse -Depth 3 -Filter claude_desktop_config.json`. Add `mcpServers` next to whatever is already in the file.
-3. Restart Claude Desktop. The tools appear under the tools icon in the chat box.
-4. Make sure the **tuya-local** tools are enabled there, and the first time Claude uses one, choose **Always allow**. Otherwise every light change, including ambient ones, waits for your approval.
+3. Fully quit Claude Desktop (including from the system tray) and reopen it. **tuya-local** now appears under **+ → Connectors**.
+4. Make sure its switch is on there, and under **+ → Connectors → Tool access** allow its tools (or choose **Always allow** the first time Claude uses one). Otherwise every light change, including ambient ones, waits for your approval.
 
 Ambient mode works here too, in two ways:
 
-- **For one chat:** in the chat box, open **+** and pick the **ambient_mode** prompt from tuya-local. It includes the current time.
-- **Always on:** set `TUYA_LOCAL_MCP_AMBIENT` to `"true"` in the config above. Claude reads the local time from `light_status` when the hour matters.
+- **Always on:** set `TUYA_LOCAL_MCP_AMBIENT` to `"true"` in the config above. Every chat starts with the ambient instructions, and Claude reads the local time from `light_status` when the hour matters.
+- **For one chat:** **+ → Connectors → Add from tuya-local → Ambient mode** attaches the instructions, with the current time, to your message. Use it when the variable is off, or to refresh the time in a long-running chat.
 
 Using both the plugin and this config entry? The desktop app also hands this server to its Code tab sessions, so the plugin notices it and steps aside there: its own copy of the server registers no tools, and its ambient hook stays quiet if the entry above has ambient on. You get each tool once. The terminal `claude` CLI doesn't read this file, so it keeps using the plugin's copy.
 
