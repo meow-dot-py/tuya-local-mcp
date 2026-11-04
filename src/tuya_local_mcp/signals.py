@@ -147,32 +147,9 @@ def _restorable(data: dict[str, Any]):
 
 def ambient_context() -> str:
     """Instructions added to each Claude Code session when ambient mode is on."""
-    from tuya_local_mcp import devices, presets
+    from tuya_local_mcp import ambient
 
-    try:
-        targets = ", ".join(devices.target_names(devices.load_lights()))
-    except config.ConfigError:
-        return ""
-    try:
-        names = ", ".join(presets.load()[0])
-    except config.ConfigError:
-        names = "code, chill, night, focus"
-    now = datetime.now().strftime("%H:%M")
-    return f"""\
-# Room lights (tuya-local-mcp ambient mode)
-You can set the mood of the user's room with the tuya-local-mcp `set_light` tool,
-without being asked. Local time at session start: {now}. Targets: {targets}.
-Presets: {names}.
-
-- Long debugging or focused work: preset `focus` (or `code`).
-- Creative or playful work: `cyber` or `gaming`.
-- Late at night (after about 22:00): `chill`, later `night`.
-- Change the mood at most once per task, and only when the kind of work clearly
-  changes. Never undo a light change the user made or asked for.
-- Red/green build and test signals are automatic (hooks): do not do them yourself.
-- Call the tool in parallel with your other work, with no commentary. At most add a
-  short tag at the end of your reply, like `[LIGHT: focus]`.
-"""
+    return ambient.guidance(claude_code=True, now=datetime.now())
 
 
 # --- hook entry point ------------------------------------------------------------------

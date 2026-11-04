@@ -9,6 +9,7 @@ $ l focus
 
 - **Local only.** Commands go straight to the bulbs over your Wi-Fi (TCP 6668). The Tuya cloud is used once, to download each bulb's key, and never again.
 - **A CLI you'll actually use.** `l` toggles the room, `l bed 20` dims the bed lamp, `l sleep 30m` turns everything off later. Output is painted in the colour the bulb shows.
+- **Works in Claude Desktop too, on any plan**, including ambient mode.
 - **Claude Code integration.** A `/light` command that understands "fireplace vibe on the desk in 10 minutes". Lights turn red when your tests fail and flash green when they pass again. An optional ambient mode lets Claude set the mood while it works.
 
 ---
@@ -21,7 +22,7 @@ $ l focus
   1. [Install the command](#1-install-the-command)
   2. [Get your bulbs' local keys (once)](#2-get-your-bulbs-local-keys-once)
   3. [Try it](#3-try-it)
-  4. [Add it to Claude Code](#4-add-it-to-claude-code)
+  4. [Add it to Claude Code](#4-add-it-to-claude-code), or [to Claude Desktop](#4b-or-add-it-to-claude-desktop-any-plan-including-free)
 - [Using the CLI](#using-the-cli)
 - [Lights, zones and targets](#lights-zones-and-targets)
 - [Presets and scenes](#presets-and-scenes)
@@ -175,6 +176,35 @@ claude mcp add tuya-local -s user -- tuya-local-mcp serve
 > [!NOTE]
 > Use one or the other. The plugin already includes the MCP server, so registering both gives Claude every tool twice.
 
+### 4b. Or add it to Claude Desktop (any plan, including free)
+
+The Claude desktop app can use the MCP server in normal chats, so you can say "make it cosy in here" or "lights off in 20 minutes" without Claude Code.
+
+1. Find the full path of the command. In PowerShell: `(Get-Command tuya-local-mcp).Source`. In bash/zsh: `which tuya-local-mcp`.
+2. In Claude Desktop, open **Settings → Developer → Edit Config** and add the server to `claude_desktop_config.json`:
+
+   ```json
+   {
+     "mcpServers": {
+       "tuya-local": {
+         "command": "C:\\Users\\you\\.local\\bin\\tuya-local-mcp.exe",
+         "args": ["serve"],
+         "env": { "TUYA_LOCAL_MCP_AMBIENT": "false" }
+       }
+     }
+   }
+   ```
+
+   Use the full path from step 1 (on Windows, double each backslash). The desktop app doesn't always see the same PATH as your terminal.
+3. Restart Claude Desktop. The tools appear under the tools icon in the chat box.
+
+Ambient mode works here too, in two ways:
+
+- **For one chat:** in the chat box, open **+** and pick the **ambient_mode** prompt from tuya-local. It includes the current time.
+- **Always on:** set `TUYA_LOCAL_MCP_AMBIENT` to `"true"` in the config above. Claude reads the local time from `light_status` when the hour matters.
+
+What you don't get outside Claude Code: the `/light` shortcut (you don't need it, just ask) and the red/green test signals (there are no commands to watch in a chat).
+
 ## Using the CLI
 
 ```text
@@ -285,7 +315,7 @@ When enabled, Claude gets a short instruction at the start of each session: shif
 | Signal commands (regex) | built-in list | your own regular expression for "test or build" commands |
 | Ambient mood | off | let Claude set the mood on its own |
 
-Without the plugin, set the same options as environment variables: `TUYA_LOCAL_MCP_SIGNALS`, `TUYA_LOCAL_MCP_SIGNAL_TARGET`, `TUYA_LOCAL_MCP_SIGNAL_COMMANDS` and `TUYA_LOCAL_MCP_AMBIENT`. To use the hooks without the plugin, copy the entries from [`plugin/hooks/hooks.json`](plugin/hooks/hooks.json) into your `settings.json`.
+Outside Claude Code, see [Claude Desktop](#4b-or-add-it-to-claude-desktop-any-plan-including-free) for ambient mode. Without the plugin, set the same options as environment variables: `TUYA_LOCAL_MCP_SIGNALS`, `TUYA_LOCAL_MCP_SIGNAL_TARGET`, `TUYA_LOCAL_MCP_SIGNAL_COMMANDS` and `TUYA_LOCAL_MCP_AMBIENT`. To use the hooks without the plugin, copy the entries from [`plugin/hooks/hooks.json`](plugin/hooks/hooks.json) into your `settings.json`.
 
 ### MCP tools
 
@@ -293,10 +323,12 @@ Without the plugin, set the same options as environment variables: `TUYA_LOCAL_M
 |---|---|
 | `power_light(state, target, delay_seconds)` | on / off / group toggle |
 | `set_light(target, preset \| brightness, temp, rgb, delay_seconds)` | apply a preset or scene, or set values |
-| `light_status(target)` | what each light is doing now |
+| `light_status(target)` | what each light is doing now, plus the local time |
 | `list_lights()` | lights, zones, the names that target them, IPs, presets |
 | `get_presets()` / `upsert_preset(name, config)` / `delete_preset(name)` | manage presets.json, with validation |
 | `scan_lan_ips()` | find moved lights and save their new IPs |
+
+The server also offers an **`ambient_mode` prompt** that switches ambient mode on for one conversation, in any client that supports MCP prompts.
 
 Every result includes a one-line `summary` and per-light `ok`/`error`, so a failure is never reported as success.
 

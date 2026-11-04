@@ -1,8 +1,14 @@
-"""The MCP server Claude Code talks to (stdio transport).
+"""The MCP server (stdio transport), for Claude Code, Claude Desktop or any MCP client.
 
 Register it once:
 
-    claude mcp add tuya-local -s user -- tuya-local-mcp serve
+    Claude Code:     claude mcp add tuya-local -s user -- tuya-local-mcp serve
+                     (or install the plugin, which includes it)
+    Claude Desktop:  see "Claude Desktop" in the README
+
+Set TUYA_LOCAL_MCP_AMBIENT=true in the server's environment to include the ambient
+mode guidance in its instructions (useful in clients without hooks). The `ambient`
+prompt switches it on for a single conversation instead.
 
 Every tool returns a dict with a ready-made one-line `summary` (the same line the
 CLI prints, without colours) so Claude can confirm an action without rephrasing.
@@ -13,9 +19,10 @@ from __future__ import annotations
 
 import functools
 from collections.abc import Callable
+from datetime import datetime
 from typing import Any, Literal
 
-from tuya_local_mcp import __version__, devices, presets, timers
+from tuya_local_mcp import __version__, ambient, devices, presets, timers
 from tuya_local_mcp.commands import Command, CommandError, execute, plan_preset
 from tuya_local_mcp.config import ConfigError, home_dir, presets_path
 from tuya_local_mcp.state import describe, make_state
@@ -43,7 +50,16 @@ def _instructions() -> str:
         )
     except ConfigError:
         pass
+    if _ambient_enabled():
+        lines += ["", ambient.guidance(claude_code=False)]
     return "\n".join(lines)
+
+
+def _ambient_enabled() -> bool:
+    import os
+
+    value = os.environ.get("TUYA_LOCAL_MCP_AMBIENT", "")
+    return value.strip().lower() in ("1", "true", "yes", "on")
 
 
 def build_server() -> Any:
@@ -85,8 +101,11 @@ def build_server() -> Any:
 
     @tool
     def light_status(target: str = "all") -> dict:
-        """Read what each target light is doing now: on, mode, brightness, temp, rgb."""
-        return execute(Command("status", target)).to_dict()
+        """Read what each target light is doing now (on, mode, brightness, temp, rgb),
+        plus the user's local time."""
+        report = execute(Command("status", target)).to_dict()
+        report["local_time"] = ambient.local_time()
+        return report
 
     @tool
     def power_light(
@@ -155,6 +174,14 @@ def build_server() -> Any:
         """
         result = devices.repair_ips()
         return {"changed": result.changed, "not_found": result.missing}
+
+    @mcp.prompt()
+    def ambient_mode() -> str:
+        """Ambient lights: let Claude set the room's mood on its own during this chat."""
+        text = ambient.guidance(claude_code=False, now=datetime.now())
+        if not text:
+            return "No lights are configured yet; run `tuya-local-mcp init` first."
+        return text + "\nReply only with one short line confirming ambient lights are on."
 
     return mcp
 
