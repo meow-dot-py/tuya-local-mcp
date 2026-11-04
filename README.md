@@ -96,8 +96,11 @@ Each bulb encrypts its local traffic with its own key. The only way to get that 
 2. Go to **Cloud → Development → Create Cloud Project**.
    - Development method: **Smart Home**.
    - Data center: the one your app account uses. If you're unsure, it's usually the closest to you: *Central Europe*, *Western America*, *Eastern America*, *India* or *China*.
-3. When asked for API services, keep the defaults (**IoT Core** and **Authorization** are the ones that matter).
+3. When asked for API services, keep the defaults. Only two are needed: **IoT Core** and **Authorization Token Management**. The others the template adds (Smart Home Basic Service, Device Status Notification, ...) are harmless. You can check them later under the project's **Service API** tab.
 4. On the project's **Overview** tab, copy the **Access ID** and **Access Secret**.
+
+> [!NOTE]
+> IoT Core is a free trial that expires after about a month. It's only needed while the wizard downloads keys, so the lights keep working after it expires. When you add or re-pair a bulb later, renew it first: **Service API → IoT Core → Extend trial period** (free, after a short questionnaire).
 
 **b. Link your Smart Life account**
 
