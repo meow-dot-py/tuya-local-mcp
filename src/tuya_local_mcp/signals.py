@@ -191,6 +191,9 @@ def run_worker(argv: list[str]) -> int:
     try:
         result = signal_fail() if argv[:1] == ["fail"] else signal_pass()
         _log(f"  {argv[:1]} -> {result}")
+    except (config.ConfigError, ValueError) as e:
+        # Expected problems (no devices.json yet, unknown signal target): one clear line.
+        _log(f"  {argv[:1]} -> skipped: {e}")
     except Exception:
         _log(traceback.format_exc())
     return 0

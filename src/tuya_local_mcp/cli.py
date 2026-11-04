@@ -254,8 +254,13 @@ def init() -> int:
 {render.tag("INIT", render.CYAN)} One-time setup: get the local key of each bulb.
 
   You need a free Tuya IoT developer account linked to your Smart Life app
-  (step-by-step guide in the README). The tinytuya wizard will ask for the
-  API key, secret and region, then download your devices.
+  (step-by-step guide in the README). The tinytuya wizard will ask for:
+
+    API Key / API Secret   the project's Access ID / Access Secret
+    any Device ID          one of your bulbs' IDs from the Tuya project
+    Your Region            eu, us, us-e, in or cn (your data center)
+    DP Name mappings?      Y   (lets each change go out as one message)
+    Poll local devices?    Y   (finds the IPs; force-close the Smart Life app first)
 
   Files are saved in {home}
   They contain secrets: never commit or share them.

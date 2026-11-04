@@ -1,0 +1,26 @@
+[
+    {
+        "name": "Ceiling Light",
+        "zone": "ceiling",
+        "id": "PUT_THE_DEVICE_ID_HERE",
+        "key": "PUT_THE_LOCAL_KEY_HERE",
+        "ip": "192.168.1.50",
+        "version": "3.3"
+    },
+    {
+        "name": "Desk Lamp",
+        "zone": "setup",
+        "id": "PUT_THE_DEVICE_ID_HERE",
+        "key": "PUT_THE_LOCAL_KEY_HERE",
+        "ip": "192.168.1.51",
+        "version": "3.3"
+    },
+    {
+        "name": "Bedside Lamp",
+        "zone": "bed",
+        "id": "PUT_THE_DEVICE_ID_HERE",
+        "key": "PUT_THE_LOCAL_KEY_HERE",
+        "ip": "192.168.1.52",
+        "version": "3.3"
+    }
+]
