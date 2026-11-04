@@ -1,5 +1,10 @@
 # tuya-local-mcp
 
+[![PyPI](https://img.shields.io/pypi/v/tuya-local-mcp?style=flat)](https://pypi.org/project/tuya-local-mcp/)
+[![CI](https://github.com/meow-dot-py/tuya-local-mcp/actions/workflows/ci.yml/badge.svg)](https://github.com/meow-dot-py/tuya-local-mcp/actions/workflows/ci.yml)
+[![License: MIT](https://img.shields.io/badge/license-MIT-blue?style=flat)](LICENSE)
+[![MCP Badge](https://lobehub.com/badge/mcp/meow-dot-py-tuya-local-mcp?style=flat)](https://lobehub.com/mcp/meow-dot-py-tuya-local-mcp)
+
 Zero-cloud LAN controller for Tuya / Smart Life bulbs: an MCP server for Claude Code plus a TrueColor CLI.
 
 ```text
@@ -79,12 +84,12 @@ Delayed commands (`l sleep 30m`, or Claude's `delay_seconds`) run in a small bac
 ### 1. Install the command
 
 ```bash
-uv tool install git+https://github.com/meow-dot-py/tuya-local-mcp
+uv tool install tuya-local-mcp
 ```
 
 This puts `tuya-local-mcp` on your PATH. Check it with `tuya-local-mcp help`.
 
-To update later, run `uv tool upgrade tuya-local-mcp`.
+To update later, run `uv tool upgrade tuya-local-mcp`. Close Claude Desktop / Claude Code first and cancel pending timers (`l cancel`): they keep the program's files in use, and the update can't replace them. The latest unreleased code installs with `uv tool install git+https://github.com/meow-dot-py/tuya-local-mcp`.
 
 ### 2. Get your bulbs' local keys (once)
 
