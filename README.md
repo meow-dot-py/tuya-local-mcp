@@ -209,6 +209,8 @@ Ambient mode works here too, in two ways:
 - **For one chat:** in the chat box, open **+** and pick the **ambient_mode** prompt from tuya-local. It includes the current time.
 - **Always on:** set `TUYA_LOCAL_MCP_AMBIENT` to `"true"` in the config above. Claude reads the local time from `light_status` when the hour matters.
 
+Using both the plugin and this config entry? The desktop app also hands this server to its Code tab sessions, so the plugin notices it and steps aside there: its own copy of the server registers no tools, and its ambient hook stays quiet if the entry above has ambient on. You get each tool once. The terminal `claude` CLI doesn't read this file, so it keeps using the plugin's copy.
+
 What you don't get outside Claude Code: the `/light` shortcut (you don't need it, just ask) and the red/green test signals (there are no commands to watch in a chat).
 
 ## Using the CLI

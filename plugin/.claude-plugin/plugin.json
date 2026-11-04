@@ -1,7 +1,7 @@
 {
   "name": "tuya-local",
   "displayName": "Tuya Local Lights",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Control Tuya / Smart Life lights over your LAN: a /light command, red/green signals when tests or builds fail and recover, and an optional ambient mood mode.",
   "author": {
     "name": "Johann 'M' Nestorida",

@@ -183,7 +183,11 @@ def handle_hook(raw: str) -> int:
         name = event.get("hook_event_name")
 
         if name == "SessionStart":
-            if flag("AMBIENT", False):
+            from tuya_local_mcp import desktop
+
+            # In the desktop app, a config entry with ambient on already covers this session.
+            covered = desktop.desktop_ambient_on(desktop.desktop_server())
+            if flag("AMBIENT", False) and not covered:
                 context = ambient_context()
                 if context:
                     out = {"hookSpecificOutput": {"hookEventName": "SessionStart",

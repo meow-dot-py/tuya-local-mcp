@@ -12,9 +12,18 @@ allowed-tools:
   - mcp__plugin_tuya-local_lights__upsert_preset
   - mcp__plugin_tuya-local_lights__delete_preset
   - mcp__plugin_tuya-local_lights__scan_lan_ips
+  # Same tools when Claude Desktop's config provides the server (named tuya-local):
+  - mcp__tuya-local__power_light
+  - mcp__tuya-local__set_light
+  - mcp__tuya-local__light_status
+  - mcp__tuya-local__list_lights
+  - mcp__tuya-local__get_presets
+  - mcp__tuya-local__upsert_preset
+  - mcp__tuya-local__delete_preset
+  - mcp__tuya-local__scan_lan_ips
 ---
 
-Control the lights with the `lights` MCP tools. Act at once, without asking for
+Control the lights with the light MCP tools (power_light, set_light, ...). Act at once, without asking for
 confirmation.
 
 ## Targets

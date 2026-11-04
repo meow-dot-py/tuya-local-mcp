@@ -66,6 +66,17 @@ def build_server() -> Any:
     from mcp.server.mcpserver import MCPServer
     from mcp.server.mcpserver.exceptions import ToolError
 
+    from tuya_local_mcp import desktop
+
+    if desktop.plugin_should_step_aside():
+        # Claude Desktop already gives this Code session our server from its config;
+        # registering the tools here too would show Claude every tool twice.
+        return MCPServer(
+            "tuya-local-mcp",
+            instructions="The light tools come from the tuya-local server in Claude Desktop's "
+            "config; this plugin copy is idle.",
+        )
+
     mcp = MCPServer("tuya-local-mcp", instructions=_instructions())
 
     def tool(fn: Callable[..., Any]) -> Callable[..., Any]:

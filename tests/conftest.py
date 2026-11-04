@@ -62,6 +62,19 @@ class Fleet:
         self.dps[dev_id] = {"20": on, "21": "white", "22": 500, "23": 500, **dps}
 
 
+@pytest.fixture(autouse=True)
+def clean_environment(monkeypatch):
+    """Tests must not depend on where they run (e.g. inside a Claude Code session)."""
+    import os
+
+    for key in list(os.environ):
+        if key.startswith(("CLAUDE_PLUGIN_", "TUYA_LOCAL_MCP_")) or key in (
+            "CLAUDE_CODE_ENTRYPOINT",
+            "CLAUDE_CODE_EXECPATH",
+        ):
+            monkeypatch.delenv(key, raising=False)
+
+
 @pytest.fixture
 def home(tmp_path, monkeypatch):
     monkeypatch.setenv("TUYA_LOCAL_MCP_HOME", str(tmp_path))

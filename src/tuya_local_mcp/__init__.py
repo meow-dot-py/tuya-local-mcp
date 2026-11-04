@@ -12,9 +12,10 @@ The package is split by responsibility so each piece can be read on its own:
     timers.py    delayed commands that survive the terminal or Claude Code closing
     signals.py   red/green build and test signals, and the Claude Code hook entry point
     ambient.py   ambient-mode guidance, shared by the hook, the server and its prompt
+    desktop.py   avoiding duplicate tools when the plugin and Claude Desktop's config overlap
     render.py    TrueColor terminal output
     cli.py       the `tuya-local-mcp` / `l` command line
     server.py    the MCP server for Claude Code
 """
 
-__version__ = "0.1.0"
+__version__ = "0.2.0"
