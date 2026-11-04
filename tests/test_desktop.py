@@ -20,6 +20,8 @@ def desktop_app(tmp_path, monkeypatch):
     monkeypatch.setenv("CLAUDE_CODE_ENTRYPOINT", "claude-desktop")
     monkeypatch.setenv("CLAUDE_CODE_EXECPATH", str(cli))
     monkeypatch.setattr(desktop.Path, "home", lambda: tmp_path / "home")
+    # Process tree: our nearest `claude` is the app's embedded CLI, a child of the app.
+    monkeypatch.setattr(desktop, "_claude_ancestor", lambda: (str(cli), True))
 
     def write(servers: dict) -> None:
         (data / "claude_desktop_config.json").write_text(
@@ -43,6 +45,22 @@ def test_no_entry_or_not_in_desktop(desktop_app, monkeypatch):
     desktop_app({"lights": ENTRY})
     monkeypatch.setenv("CLAUDE_CODE_ENTRYPOINT", "cli")  # the terminal CLI
     assert desktop.desktop_server() is None
+
+
+def test_terminal_claude_inside_the_app_is_not_the_app(desktop_app, monkeypatch):
+    """`claude` run from a terminal in the app inherits the app's env but not its servers."""
+    desktop_app({"lights": ENTRY})
+    monkeypatch.setattr(desktop, "_claude_ancestor", lambda: ("C:/bin/claude.exe", False))
+    assert desktop.desktop_server() is None
+    monkeypatch.setattr(desktop, "_claude_ancestor", lambda: None)  # tree unreadable
+    assert desktop.desktop_server() is None, "when unsure, prefer duplicates over no tools"
+
+
+def test_process_table_reads_this_process():
+    table = desktop._process_table()
+    import os
+
+    assert os.getpid() in table and table[os.getpid()][0] == os.getppid()
 
 
 def test_plugin_server_goes_idle(desktop_app, monkeypatch, three_lights):
