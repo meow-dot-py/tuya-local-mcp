@@ -1,0 +1,29 @@
+# --- Secrets: never commit these -------------------------------------------
+# `tinytuya wizard` writes your Tuya Cloud API credentials and every bulb's
+# local_key into these files. tuya-local-mcp keeps them in its config folder
+# (~/.config/tuya-local-mcp), but ignore them here too in case someone runs the
+# wizard from inside the repository.
+devices.json
+tinytuya.json
+tuya-raw.json
+snapshot.json
+presets.json
+*.local.json
+
+# --- Python ------------------------------------------------------------------
+__pycache__/
+*.py[cod]
+*.egg-info/
+build/
+dist/
+.venv/
+.pytest_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+
+# --- Editors / OS ------------------------------------------------------------
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
