@@ -199,6 +199,8 @@ The Claude desktop app can use the MCP server in normal chats, so you can say "m
    ```
 
    Use the full path from step 1 (on Windows, double each backslash). The desktop app doesn't always see the same PATH as your terminal.
+
+   Can't find the menu? Edit the file directly. Usually it's `%APPDATA%\Claude\claude_desktop_config.json` on Windows and `~/Library/Application Support/Claude/claude_desktop_config.json` on macOS. Microsoft Store installs may keep it elsewhere, such as `%LOCALAPPDATA%\Claude-Data\claude_<id>\`. This PowerShell command finds it: `Get-ChildItem $env:APPDATA, $env:LOCALAPPDATA -Recurse -Depth 3 -Filter claude_desktop_config.json`. Add `mcpServers` next to whatever is already in the file.
 3. Restart Claude Desktop. The tools appear under the tools icon in the chat box.
 
 Ambient mode works here too, in two ways:
