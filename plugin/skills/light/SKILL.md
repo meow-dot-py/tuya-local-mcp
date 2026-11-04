@@ -12,6 +12,8 @@ allowed-tools:
   - mcp__plugin_tuya-local_lights__upsert_preset
   - mcp__plugin_tuya-local_lights__delete_preset
   - mcp__plugin_tuya-local_lights__scan_lan_ips
+  - mcp__plugin_tuya-local_lights__list_timers
+  - mcp__plugin_tuya-local_lights__cancel_timer
   # Same tools when Claude Desktop's config provides the server (named tuya-local):
   - mcp__tuya-local__power_light
   - mcp__tuya-local__set_light
@@ -21,6 +23,8 @@ allowed-tools:
   - mcp__tuya-local__upsert_preset
   - mcp__tuya-local__delete_preset
   - mcp__tuya-local__scan_lan_ips
+  - mcp__tuya-local__list_timers
+  - mcp__tuya-local__cancel_timer
 ---
 
 Control the lights with the light MCP tools (power_light, set_light, ...). Act at once, without asking for
@@ -53,6 +57,8 @@ Call `power_light` or `set_light` directly. Do not call `light_status`,
   (`{"temp": 20, "brightness": 50}`), `{"targets": {...}}` for a scene. To edit one,
   `get_presets` first, change only what was asked, then `upsert_preset`.
 - Remove a preset: `delete_preset(name)`.
+- Timers: `list_timers` to see pending ones; `cancel_timer(timer_id)` or `cancel_timer("all")`
+  to cancel. To change a scheduled action, cancel it and schedule the new one.
 
 ## Reply
 One line: the tool result's `summary`, as is. No other text, unless something failed;

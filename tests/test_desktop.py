@@ -80,7 +80,7 @@ def test_plugin_server_normal_without_desktop_entry(desktop_app, monkeypatch, th
     import asyncio
 
     tools = asyncio.run(server.build_server().list_tools())
-    assert len(tools) == 8
+    assert len(tools) == 10
 
 
 def test_hook_leaves_ambient_to_desktop_entry(desktop_app, monkeypatch, three_lights, capsys):

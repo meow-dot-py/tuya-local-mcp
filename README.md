@@ -228,6 +228,8 @@ l [target] <preset>       l focus · l bed night
 l [target] <bri> [temp]   l 40 · l setup 85 90   (brightness 1-100, temp 0 warm - 100 cool)
 l [target] rgb R G B [bri]   l rgb 255 0 128
 l [target] sleep <time> [command]   l sleep 30m · l bed sleep 1h night
+l timers                  pending timers, with their ids
+l cancel [id]             cancel one timer, or all of them
 l [target] status
 
 l presets                 your presets, with colour previews
@@ -237,7 +239,7 @@ l init                    the one-time key download (step 2)
 l signal fail|pass        try the red/green build signal by hand
 ```
 
-Durations accept `90`, `45s`, `10m`, `1h30m` or `1.5h`. Out-of-range numbers are clamped with a warning. A mistyped word gets a suggestion (`'focsu' ... Did you mean: focus?`). The exit code is `0` on success, `1` if any light failed and `2` for a usage error, so the CLI works in scripts.
+Durations accept `90`, `45s`, `10m`, `1h30m` or `1.5h`. Timers survive closing the terminal or Claude, and each one gets a short id you can cancel it by (`[TIMER 8ee7] ... cancel: l cancel 8ee7`). Out-of-range numbers are clamped with a warning. A mistyped word gets a suggestion (`'focsu' ... Did you mean: focus?`). The exit code is `0` on success, `1` if any light failed and `2` for a usage error, so the CLI works in scripts.
 
 Colours turn off automatically when the output isn't a terminal or `NO_COLOR` is set.
 
@@ -340,6 +342,7 @@ Outside Claude Code, see [Claude Desktop](#4b-or-add-it-to-claude-desktop-any-pl
 | `light_status(target)` | what each light is doing now, plus the local time |
 | `list_lights()` | lights, zones, the names that target them, IPs, presets |
 | `get_presets()` / `upsert_preset(name, config)` / `delete_preset(name)` | manage presets.json, with validation |
+| `list_timers()` / `cancel_timer(timer_id \| "all")` | see and cancel pending timers |
 | `scan_lan_ips()` | find moved lights and save their new IPs |
 
 The server also offers an **`ambient_mode` prompt** that switches ambient mode on for one conversation, in any client that supports MCP prompts.

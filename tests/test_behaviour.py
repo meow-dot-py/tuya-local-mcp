@@ -139,7 +139,9 @@ def test_command_json_round_trip():
 
 def test_sleep_validates_before_scheduling(three_lights, monkeypatch, capsys):
     scheduled = []
-    monkeypatch.setattr(timers, "schedule", lambda s, c: scheduled.append((s, c)))
+    monkeypatch.setattr(
+        timers, "schedule", lambda s, c: scheduled.append((s, c)) or timers.Timer("ab12", 0, c)
+    )
     assert cli.main(["bed", "sleep", "30m", "night"]) == 0
     assert scheduled == [(1800, Command("preset", "bed", preset="night"))]
     assert cli.main(["sleep", "10m"]) == 0

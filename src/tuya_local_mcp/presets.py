@@ -35,6 +35,7 @@ RESERVED_NAMES = frozenset(
     {
         "all", "on", "off", "toggle", "t", "status", "scan", "sleep", "rgb",
         "presets", "lights", "init", "serve", "help", "version", "signal", "hook",
+        "timers", "cancel",
     }
 )  # fmt: skip
 

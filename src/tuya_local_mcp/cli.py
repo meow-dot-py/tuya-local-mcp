@@ -41,6 +41,8 @@ Usage: l [target] <command>
   <brightness>[%] [temp]       white light, e.g. `l 40` or `l 85 90` (temp 0 warm - 100 cool)
   rgb <r> <g> <b> [bright]     colour, e.g. `l rgb 255 0 128`
   sleep <duration> [command]   run later: `l sleep 30m` (off), `l bed sleep 1h night`
+  timers                       list pending timers
+  cancel [id]                  cancel one timer, or all of them
   status                       what each light is doing right now
 
   presets                      list presets with a colour preview
@@ -57,7 +59,19 @@ Combine with commas: `l bed,setup off`. Config folder: {home}
 
 POWER_WORDS = {"on", "off", "toggle", "t"}
 ACTION_WORDS = POWER_WORDS | {"status", "rgb", "sleep"}
-GLOBAL_WORDS = {"presets", "lights", "scan", "init", "serve", "help", "version", "signal", "hook"}
+GLOBAL_WORDS = {
+    "presets",
+    "lights",
+    "scan",
+    "init",
+    "serve",
+    "help",
+    "version",
+    "signal",
+    "hook",
+    "timers",
+    "cancel",
+}
 
 
 class UsageError(ValueError):
@@ -103,6 +117,10 @@ def main(argv: list[str]) -> int:
             return list_presets()
         if first == "signal":
             return signal(argv[1:])
+        if first == "timers":
+            return list_timers()
+        if first == "cancel":
+            return cancel_timers(argv[1:])
         return run(argv)
     except (UsageError, config.ConfigError, UnknownTarget, CommandError, PresetError,
             InvalidState) as e:  # fmt: skip
@@ -206,10 +224,37 @@ def schedule(
     if cmd.action == "preset":
         plan_preset(available[cmd.preset or ""], lights, target)
 
-    timers.schedule(seconds, cmd)
+    timer = timers.schedule(seconds, cmd)
     what = " ".join(inner)
-    print(f"{render.tag('TIMER', (230, 180, 80))} in {timers.format_duration(seconds)}: "
-          f"{what} {render.dim(f'({target})')}")  # fmt: skip
+    print(f"{render.tag('TIMER ' + timer.id, TIMER_COLOR)} in {timers.format_duration(seconds)}: "
+          f"{what} {render.dim(f'({target})  cancel: l cancel {timer.id}')}")  # fmt: skip
+    return 0
+
+
+TIMER_COLOR = (230, 180, 80)
+
+
+def list_timers() -> int:
+    pending = timers.list_timers()
+    if not pending:
+        print(render.dim("No pending timers."))
+    for timer in pending:
+        print(f"{render.tag('TIMER ' + timer.id, TIMER_COLOR)} {timer.summary().split(': ', 1)[1]}")
+    return 0
+
+
+def cancel_timers(args: list[str]) -> int:
+    if len(args) > 1:
+        raise UsageError("Usage: l cancel [id]   (no id: cancel all timers)")
+    try:
+        cancelled = timers.cancel(args[0] if args else None)
+    except ValueError as e:
+        raise UsageError(str(e)) from None
+    if not cancelled:
+        print(render.dim("No pending timers."))
+    for timer in cancelled:
+        tag = render.tag("CANCELLED " + timer.id, render.GREY)
+        print(f"{tag} {timer.what} ({timer.command.target})")
     return 0
 
 

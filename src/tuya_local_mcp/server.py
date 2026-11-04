@@ -26,7 +26,7 @@ from typing import Any, Literal
 from tuya_local_mcp import __version__, ambient, devices, presets, timers
 from tuya_local_mcp.commands import Command, CommandError, execute, plan_preset
 from tuya_local_mcp.config import ConfigError, home_dir, presets_path
-from tuya_local_mcp.state import describe, make_state
+from tuya_local_mcp.state import make_state
 
 
 def _instructions() -> str:
@@ -191,6 +191,20 @@ def build_server() -> Any:
         return {"deleted": name.strip().lower()}
 
     @tool
+    def list_timers() -> dict:
+        """List pending timers (from delay_seconds or the CLI's `sleep`): id, what, when."""
+        return {"timers": [t.to_dict() for t in timers.list_timers()]}
+
+    @tool
+    def cancel_timer(timer_id: str = "all") -> dict:
+        """Cancel a pending timer by id, or every pending timer with "all"."""
+        cancelled = timers.cancel(timer_id)
+        return {
+            "cancelled": [t.to_dict() for t in cancelled],
+            "summary": f"[CANCELLED] {len(cancelled)} timer(s)",
+        }
+
+    @tool
     def scan_lan_ips() -> dict:
         """Listen for Tuya broadcasts (~6 s) and save any light IP that changed.
 
@@ -225,14 +239,10 @@ def _run_or_schedule(cmd: Command, delay_seconds: int) -> dict:
     if delay_seconds > 0:
         if delay_seconds > timers.MAX_DELAY:
             raise ValueError("delay_seconds can be at most 7 days (604800).")
-        timers.schedule(delay_seconds, cmd)
-        when = timers.format_duration(delay_seconds)
-        what = cmd.preset or (describe(cmd.state) if cmd.state else cmd.action)
-        return {
-            "scheduled": True,
-            "in": when,
-            "summary": f"[TIMER] in {when}: {what} ({cmd.target})",
-        }
+        timer = timers.schedule(delay_seconds, cmd)
+        summary = f"[TIMER {timer.id}] in {timers.format_duration(delay_seconds)}: "
+        summary += f"{timer.what} ({cmd.target})"
+        return {"scheduled": True, **timer.to_dict(), "summary": summary}
     return execute(cmd, lights).to_dict()
 
 
